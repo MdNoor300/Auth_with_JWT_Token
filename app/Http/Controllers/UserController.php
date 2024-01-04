@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
-    
+    //user registration
     function UserRegistration(Request $request){
         try{
             User::create([
@@ -37,6 +37,7 @@ class UserController extends Controller
          
     }
 
+    //user login
     function UserLogin(Request $request){
         $count = User::where('email', $request->input('email'))
             ->where('password', $request->input('password'))     
@@ -54,10 +55,10 @@ class UserController extends Controller
                 'status' => 'failed',
                 'message' => 'Unauthorized'
             ]);
-        }
+        }  
     }
 
-
+     //user forgate password otp send 
     function SendOTPCode(Request $request){
 
         $email=$request->input('email');
@@ -83,5 +84,60 @@ class UserController extends Controller
         }
     }
     
+     //user verify OTP code
+    function VerifyOTP(Request $request){
+        $email = $request->input('email');
+        $otp = $request->input('otp');
+        $count = User::where('email','=',$email)
+        ->where('otp','=',$otp)->count();
 
+        if($count == 1){
+            //Database OTP Update
+            User::where('email','=',$email)->update(['otp'=>'0']);
+
+            //password reset token issue  
+            $token = JWTToken::CreateToken($request->input('email'));
+            return response()->json([
+                'status' => 'success',
+                'message' => 'OTP Verification Successful',
+                'token' => $token,
+            ]);
+        }
+        else{
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'unauthorized'
+            ]);
+        }
+    }
+
+     // user reset password after otp verification
+     function ResetPassword(Request $request)
+     {
+         try {
+             $email = $request->header('email');
+             $password = $request->input('password');
+             User::where('email', '=', $email)->update(['password' => $password]);
+     
+             return response()->json([
+                 'status' => 'success',
+                 'message' => 'Password reset successfully'
+             ]);
+     
+         } catch (Exception $e) {
+             return response()->json([
+                 'status' => 'failed',
+                 'message' => 'Something went wrong: ' . $e->getMessage()
+             ]);
+         }
+     }
+     
 }
+
+
+
+
+
+
+
+
