@@ -11,31 +11,57 @@ use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
+    function LoginPage(){
+        return view('pages.auth.login-page');
+    }
+
+    function RegistrationPage(){
+        return view('pages.auth.registration-page');
+    }
+    function SendOtpPage(){
+        return view('pages.auth.send-otp-page');
+    }
+    function VerifyOTPPage(){
+        return view('pages.auth.verify-otp-page');
+    }
+
+    function ResetPasswordPage(){
+        return view('pages.auth.reset-pass-page');
+    }
+
+    function ProfilePage(){
+        return view('pages.dashboard.profile-page');
+    }
+
+
+
+
+
+
+
     //user registration
     function UserRegistration(Request $request){
-        try{
+        try {
             User::create([
                 'firstName' => $request->input('firstName'),
                 'lastName' => $request->input('lastName'),
                 'email' => $request->input('email'),
                 'mobile' => $request->input('mobile'),
                 'password' => $request->input('password')
-           ]);
-   
-           return response()->json([
-               'status' => 'success',
-               'massage' =>'User Registration Successful'
-           ]);
-        }
-        catch (Exception $e) {
+            ]);
+    
             return response()->json([
-                'status' => 'failed' ,
-                'massage' =>'User Registration failed'
-                //'massage' => $e->getMessage()  //this line can used to display error message
+                'status' => 'success',
+                'message' => 'User Registration Successful'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'failed',
+                'message' => 'User Registration failed'
             ]);
         }
-         
     }
+    
 
     //user login
     function UserLogin(Request $request){
@@ -49,12 +75,12 @@ class UserController extends Controller
                 'status' => 'success',
                 'message' => 'User Login Successful',
                 'token' => $token,
-            ]);
+            ],200)->cookie('token',$token,60*24*30);
         } else {
             return response()->json([
                 'status' => 'failed',
                 'message' => 'Unauthorized'
-            ]);
+            ],200);
         }  
     }
 
@@ -112,13 +138,12 @@ class UserController extends Controller
     }
 
      // user reset password after otp verification
-     function ResetPassword(Request $request)
-     {
+     function ResetPassword(Request $request){
          try {
              $email = $request->header('email');
              $password = $request->input('password');
              User::where('email', '=', $email)->update(['password' => $password]);
-     
+      
              return response()->json([
                  'status' => 'success',
                  'message' => 'Password reset successfully'
