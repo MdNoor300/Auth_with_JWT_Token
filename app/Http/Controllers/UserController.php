@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
+    //For user view 
     function LoginPage(){
         return view('pages.auth.login-page');
     }
@@ -157,6 +158,11 @@ class UserController extends Controller
          }
      }
      
+     //User Logout
+     function UserLogout(Request $request) {
+        return redirect('/userLogin')->cookie('token', '', -1);
+    }
+    
 }
 
 

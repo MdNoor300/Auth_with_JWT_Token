@@ -167,7 +167,7 @@
 <script>
     getList();
     async function getList() {
-        showLoader();
+        //showLoader();
         let res=await axios.get("/summary");
 
         document.getElementById('product').innerText=res.data['product']
@@ -179,6 +179,6 @@
         document.getElementById('payable').innerText=res.data['payable']
 
 
-        hideLoader();
+        //hideLoader();
     }
 </script>
